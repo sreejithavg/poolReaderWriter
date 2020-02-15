@@ -46,12 +46,12 @@ func main()  {
 	var q =make(chan queue)
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go reader(q,&wg)
-	time.Sleep(time.Second*2)
 	go writer(q,&wg)
+	time.Sleep(time.Second*2)
+	go reader(q,&wg)
 	wg.Wait()
 }
-func reader(q chan queue,wg *sync.WaitGroup){
+func writer(q chan queue,wg *sync.WaitGroup){
 	var queue queue
 	defer wg.Done()
 	t:=time.Now()
@@ -62,7 +62,7 @@ func reader(q chan queue,wg *sync.WaitGroup){
 	}
 }
 
-func writer(q chan queue,wg *sync.WaitGroup)  {
+func reader(q chan queue,wg *sync.WaitGroup)  {
 	defer wg.Done()
 	select {
 	case msg,ok:=<-q :
@@ -72,6 +72,7 @@ func writer(q chan queue,wg *sync.WaitGroup)  {
 			time.Sleep(time.Second*1)
 			fmt.Print("channel is closed")
 		}
+
 	default:
 		fmt.Print("empty queue")
 	}
