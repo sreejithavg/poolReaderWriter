@@ -47,7 +47,7 @@ func main()  {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go writer(q,&wg)
-	time.Sleep(time.Second*2)
+	time.Sleep(time.Millisecond*200)
 	go reader(q,&wg)
 	wg.Wait()
 }
@@ -63,18 +63,22 @@ func writer(q chan queue,wg *sync.WaitGroup){
 }
 
 func reader(q chan queue,wg *sync.WaitGroup)  {
-	defer wg.Done()
-	select {
-	case msg,ok:=<-q :
-		if ok{
-			fmt.Print(msg)
-		}else{
-			time.Sleep(time.Second*1)
-			fmt.Print("channel is closed")
-		}
 
-	default:
-		fmt.Print("empty queue")
+	for {
+		select {
+		case msg,ok:=<-q :
+			if ok{
+				fmt.Println(msg)
+			}else{
+				time.Sleep(time.Second*1)
+				fmt.Println("channel is closed")
+			}
+
+		default:
+			fmt.Println("empty queue")
+			goto DONE
+		}
 	}
+	DONE:wg.Done()
 
 }
